@@ -17,7 +17,7 @@ echo "we love code and we love"
 echo $1
 ```
 
-1. Gave that file permission to be run:
-   `chmod +x ~/bin/new-app`
+Finally - I gave that file permission to be run:
+`chmod +x ~/bin/new-app`
 
 I can now run `new-app thing` in shell and echoes back to me love for thing.
