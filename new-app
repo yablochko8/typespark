@@ -45,7 +45,7 @@ if [ "$ADD_EXPRESS" = "Y" ] || [ "$ADD_EXPRESS" = "y" ] || [ -z "$ADD_EXPRESS" ]
   npm i --save-dev @types/cors
   echo "Express server setup completed in the 'server' directory."
   cp ~/bin/boilerplate.server.ts ./server.ts
-  echo "Boilerplate server file copied to 'app-name/server/server.ts'."
+  echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
   pm2 start 'bun --watch server.ts' --name devserver
   cd ..
   cp ~/bin/boilerplate.App.tsx ./src/App.tsx
