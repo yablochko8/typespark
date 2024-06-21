@@ -1,14 +1,25 @@
 import express from "express";
 import cors from "cors";
-import { PORT } from "./somewhere";
+
+export const PORT = 4101;
+
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
 app.get("/", async (req, res) => {
-  const data = "real data";
-  res.json({ items: data });
+  console.log("GET endpoint called.");
+  res.json({ message: "Hello from the server" });
+});
+
+const storedValues: string[] = [];
+
+app.post("/newmessage", async (req, res) => {
+  console.log("POST endpoint called.");
+  const newMessage = req.body.message;
+  storedValues.push(newMessage);
+  res.json({ messages: storedValues });
 });
 
 app.listen(PORT, () => {

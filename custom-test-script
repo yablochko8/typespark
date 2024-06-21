@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+# This is just a junk script - trying something out
+
+echo "Please select a color:"
+echo "B) Blue"
+echo "G) Green"
+echo "Y) Yellow"
+
+read -p "Enter your choice [1-3]: " choice
+
+case $choice in
+  B)
+    echo "You selected Blue"
+    # Add commands to execute for Blue
+    ;;
+  G)
+    echo "You selected Green"
+    # Add commands to execute for Green
+    ;;
+  Y)
+    echo "You selected Yellow"
+    # Add commands to execute for Yellow
+    ;;
+  *)
+    echo "Invalid choice. Please run the script again and select a valid option."
+    exit 1
+    ;;
+esac

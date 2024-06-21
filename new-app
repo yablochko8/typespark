@@ -35,8 +35,13 @@ if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
   cp ~/bin/boilerplate.server.ts ./server.ts
   echo "Boilerplate server file copied to 'server/server.ts'."
   cd ..
+  cp ~/bin/boilerplate.App.tsx ./src/App.tsx
 else
   echo "Express server setup skipped."
 fi
 
 code .
+
+pm2 start 'bun --watch server/server.ts' --name testserver
+
+npm run dev
