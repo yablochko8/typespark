@@ -40,5 +40,5 @@ model Thing {
   // relationships
   person Person @relation(fields: [personId], references: [id])
 
-  @@map("book")
+  @@map("thing")
 }
