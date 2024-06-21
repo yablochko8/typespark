@@ -20,4 +20,28 @@ cd $APP_NAME
 
 npm install
 
+read -p "Do you want to add an Express server? (yes/no): " ADD_EXPRESS
+
+# Check the user's response
+if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
+  mkdir server
+  cd server
+  npm init -y
+  npm install express
+  npm i --save-dev @types/express
+  npm install cors
+  npm i --save-dev @types/cors
+  echo "Express server setup completed in the 'server' directory."
+  cp ~/bin/boilerplate.server.ts ./server.ts
+  echo "Boilerplate server file copied to 'server/server.ts'."
+  cd ..
+  cp ~/bin/boilerplate.App.tsx ./src/App.tsx
+else
+  echo "Express server setup skipped."
+fi
+
 code .
+
+pm2 start 'bun --watch server/server.ts' --name testserver
+
+npm run dev
