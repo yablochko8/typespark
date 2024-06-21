@@ -76,8 +76,6 @@ fi
 
 
 
-
-
 code .
 
 pm2 start 'npm run dev' --name testclient
@@ -86,3 +84,9 @@ sleep .5
 # Waits half a second before firing up the browser
 
 open http://localhost:5173/
+
+
+
+if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
+pm2 logs
+fi
