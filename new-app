@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "we love code and we love"
+echo $1
