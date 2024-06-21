@@ -38,7 +38,7 @@ model Thing {
   personId Int
 
   // relationships
-  author Person @relation(fields: [personId], references: [id])
+  person Person @relation(fields: [personId], references: [id])
 
   @@map("book")
 }
