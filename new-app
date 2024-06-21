@@ -1,4 +1,23 @@
 #!/bin/bash
 
-echo "we love code and we love"
-echo $1
+cd ~/fractal-projs
+
+if [ "$1" != "vite" ]; then
+    echo "Invalid argument. Say new-app vite or say nothing at all"
+    exit 1
+fi
+
+read -p "Give the new app a (kebab-case) name: " APP_NAME
+
+if [ -z "$APP_NAME" ]; then
+    echo "App name cannot be empty."
+    exit 1
+fi
+
+npm create vite@latest $APP_NAME -- --template react-swc-ts
+
+cd $APP_NAME
+
+npm install
+
+code .
