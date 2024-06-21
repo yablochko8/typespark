@@ -2,10 +2,12 @@
 
 cd ~/fractal-projs/APPS-FROM-SCRIPTS
 
-if [ "$1" != "vite" ]; then
-    echo "Invalid argument. Say new-app vite or say nothing at all"
-    exit 1
-fi
+# if [ "$1" != "vite" ]; then
+#     echo "Invalid argument. Say new-app vite or say nothing at all"
+#     exit 1
+# fi
+
+echo "This script only supports Vite apps."
 
 read -p "Give the new app a (kebab-case) name: " APP_NAME
 
@@ -14,10 +16,11 @@ if [ -z "$APP_NAME" ]; then
     exit 1
 fi
 
-read -p "Do you want to add an Express server? (y/n): " ADD_EXPRESS
+read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS
 
-read -p "Do you need a PostgreSQL database? (y/n): " ADD_POSTGRES
+read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES
 
+read -p "Do you to add Vitest for test coverage? (Y/n): " ADD_VITEST
 
 npm create vite@latest $APP_NAME -- --template react-swc-ts
 
@@ -32,7 +35,7 @@ pm2 delete all
 
 
 # Check the user's response
-if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
+if [ "$ADD_EXPRESS" = "Y" ] || [ "$ADD_EXPRESS" = "y" ] || [ -z "$ADD_EXPRESS" ]; then
   mkdir server
   cd server
   npm init -y
@@ -42,8 +45,8 @@ if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
   npm i --save-dev @types/cors
   echo "Express server setup completed in the 'server' directory."
   cp ~/bin/boilerplate.server.ts ./server.ts
-  echo "Boilerplate server file copied to 'app-name/server/server.ts'."
-  pm2 start 'bun --watch server.ts' --name testserver
+  echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
+  pm2 start 'bun --watch server.ts' --name devserver
   cd ..
   cp ~/bin/boilerplate.App.tsx ./src/App.tsx
   echo "Boilerplate client file updated with server routes in 'app-name/src/App.tsx'."
@@ -55,13 +58,12 @@ fi
 
 
 # Check the user's response
-if [ "$ADD_POSTGRES" = "yes" ] || [ "$ADD_POSTGRES" = "y" ]; then
+if [ "$ADD_POSTGRES" = "Y" ] || [ "$ADD_POSTGRES" = "y" ] || [ -z "$ADD_POSTGRES" ]; then
   docker compose down
   npm install prisma --save-dev
   npx prisma
   npx prisma init
   cp ~/bin/boilerplate.docker-compose.yml ./docker-compose.yml
-  cp ~/bin/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
   echo "Boilerplate Docker yml files added."
   cp ~/bin/boilerplate.dotenv ./.env
   cp ~/bin/boilerplate.dotenv.test ./.env.test
@@ -76,9 +78,35 @@ fi
 
 
 
+
+# Check the user's response
+if [ "$ADD_VITEST" = "Y" ] || [ "$ADD_VITEST" = "y" ] || [ -z "$ADD_VITEST" ]; then
+  npm install -D vitest
+
+  if [ "$ADD_POSTGRES" = "Y" ] || [ "$ADD_POSTGRES" = "y" ] || [ -z "$ADD_POSTGRES" ]; then
+  npm install dotenv
+  cp ~/bin/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
+  cp ~/bin/boilerplate.dotenv.test ./.env.test
+  npm pkg set scripts.test:env="npx dotenv -e .env.test vitest"
+  npm pkg set scripts.test:server:up="pm2 start 'bun server/server.ts' --name testserver"
+  npm pkg set scripts.test:server:down="pm2 delete testserver"
+  npm pkg set scripts.test:prisma:migrate="npx prisma migrate dev --name initial-setup --force"
+  npm pkg set scripts.test:docker:up="docker compose -f docker-compose.test.yml up -d"
+  npm pkg set scripts.test:docker:down="docker compose -f docker-compose.test.yml down"
+  npm pkg set scripts.test:run="vitest run"
+  npm pkg set scripts.test-all="npm run test:docker:up && npx dotenv-cli -e .env.test -- npm run test:prisma:migrate && npx dotenv-cli -e .env.test -- npm run test:server:up && npx dotenv-cli -e .env.test -- npm run test:run; npm run test:server:down && npm run test:docker:down"
+
+  fi
+
+else
+  echo "Vitest setup skipped."
+fi
+
+
+
 code .
 
-pm2 start 'npm run dev' --name testclient
+pm2 start 'npm run dev' --name devclient
 
 sleep .5
 # Waits half a second before firing up the browser
@@ -86,7 +114,8 @@ sleep .5
 open http://localhost:5173/
 
 
-
-if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
+# At the very end we want to fire up pm2 logs IF we have a server running there
+# as that will give us the server console messages.
+if [ "$ADD_EXPRESS" = "Y" ] || [ "$ADD_EXPRESS" = "y" ] || [ -z "$ADD_EXPRESS" ]; then
 pm2 logs
 fi
