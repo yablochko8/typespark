@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ~/fractal-projs
+cd ~/fractal-projs/APPS-FROM-SCRIPTS
 
 if [ "$1" != "vite" ]; then
     echo "Invalid argument. Say new-app vite or say nothing at all"
@@ -14,13 +14,22 @@ if [ -z "$APP_NAME" ]; then
     exit 1
 fi
 
+read -p "Do you want to add an Express server? (y/n): " ADD_EXPRESS
+
+read -p "Do you need a PostgreSQL database? (y/n): " ADD_POSTGRES
+
+
 npm create vite@latest $APP_NAME -- --template react-swc-ts
 
 cd $APP_NAME
 
 npm install
+npm init -y
 
-read -p "Do you want to add an Express server? (yes/no): " ADD_EXPRESS
+pm2 delete all
+# This clears away any pm2 processes that were already in place and might compete for a PORT slot
+
+
 
 # Check the user's response
 if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
@@ -33,15 +42,51 @@ if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
   npm i --save-dev @types/cors
   echo "Express server setup completed in the 'server' directory."
   cp ~/bin/boilerplate.server.ts ./server.ts
-  echo "Boilerplate server file copied to 'server/server.ts'."
+  echo "Boilerplate server file copied to 'app-name/server/server.ts'."
+  pm2 start 'bun --watch server.ts' --name testserver
   cd ..
   cp ~/bin/boilerplate.App.tsx ./src/App.tsx
+  echo "Boilerplate client file updated with server routes in 'app-name/src/App.tsx'."
 else
   echo "Express server setup skipped."
 fi
 
+
+
+
+# Check the user's response
+if [ "$ADD_POSTGRES" = "yes" ] || [ "$ADD_POSTGRES" = "y" ]; then
+  docker compose down
+  npm install prisma --save-dev
+  npx prisma
+  npx prisma init
+  cp ~/bin/boilerplate.docker-compose.yml ./docker-compose.yml
+  cp ~/bin/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
+  echo "Boilerplate Docker yml files added."
+  cp ~/bin/boilerplate.dotenv ./.env
+  cp ~/bin/boilerplate.dotenv.test ./.env.test
+  cp ~/bin/boilerplate.schema.prisma ./prisma/schema.prisma
+  npx prisma migrate dev --name initial-setup --force
+  docker compose up
+  pm2 start 'npx prisma studio' --name prismastudio
+
+else
+  echo "Postgres setup skipped."
+fi
+
+
+
 code .
 
-pm2 start 'bun --watch server/server.ts' --name testserver
+pm2 start 'npm run dev' --name testclient
 
-npm run dev
+sleep .5
+# Waits half a second before firing up the browser
+
+open http://localhost:5173/
+
+
+
+if [ "$ADD_EXPRESS" = "yes" ] || [ "$ADD_EXPRESS" = "y" ]; then
+pm2 logs
+fi
