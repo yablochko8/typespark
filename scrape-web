@@ -19,7 +19,7 @@ fi
 read -p "How many pages DEEP do you want dig from this page? (default = 2) " MAX_DEPTH
 
 if [ -z "MAX_DEPTH" ]; then
-    MAX_DEPTH = 2
+    MAX_DEPTH=2
 fi
 
 read -p "How many links on each page do you to crawl? (default = 10) " MAX_BREADTH
