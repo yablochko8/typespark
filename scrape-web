@@ -1,0 +1,33 @@
+#!/bin/bash
+
+cd ~/fractal-projs/simple-scraper
+
+# if [ "$1" != "vite" ]; then
+#     echo "Invalid argument. Say new-app vite or say nothing at all"
+#     exit 1
+# fi
+
+echo "This is a scrappy web scraper."
+
+read -p "What page do you want to start on? Paste in the URL: " URL_NAME
+
+if [ -z "$URL_NAME" ]; then
+    echo "URL cannot be empty."
+    exit 1
+fi
+
+read -p "How many pages DEEP do you want dig from this page? (default = 2) " MAX_DEPTH
+
+if [ -z "MAX_DEPTH" ]; then
+    MAX_DEPTH=2
+fi
+
+read -p "How many links on each page do you to crawl? (default = 10) " MAX_BREADTH
+
+if [ -z "MAX_BREADTH" ]; then
+    MAX_BREADTH = 10
+fi
+
+bun scrappy-scraper.ts "$URL_NAME" --depth "$MAX_DEPTH" --per-page "$MAX_BREADTH"
+
+echo "REQUEST PROCESSED -- Check your Downloads folder for scraped content"
