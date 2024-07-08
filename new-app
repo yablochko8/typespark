@@ -2,11 +2,6 @@
 
 cd ~/fractal-projs/APPS-FROM-SCRIPTS
 
-# if [ "$1" != "vite" ]; then
-#     echo "Invalid argument. Say new-app vite or say nothing at all"
-#     exit 1
-# fi
-
 echo "This script only supports Vite apps."
 
 read -p "Give the new app a (kebab-case) name: " APP_NAME
@@ -32,6 +27,8 @@ ADD_EXPRESS=$(is_affirmative "$ADD_EXPRESS_RESPONSE" && echo true || echo false)
 ADD_POSTGRES=$(is_affirmative "$ADD_POSTGRES_RESPONSE" && echo true || echo false)
 ADD_VITEST=$(is_affirmative "$ADD_VITEST_RESPONSE" && echo true || echo false)
 
+# Create the frontend project
+
 npm create vite@latest $APP_NAME -- --template react-swc-ts
 
 cd $APP_NAME
@@ -44,7 +41,7 @@ pm2 delete all
 
 
 
-# Check the user's response
+# Add an express server if requested
 if $ADD_EXPRESS; then
   mkdir server
   cd server
@@ -67,7 +64,7 @@ fi
 
 
 
-# Check the user's response
+# Add a database if requested
 if $ADD_POSTGRES; then
   docker compose down
   npm install prisma --save-dev
@@ -89,7 +86,7 @@ fi
 
 
 
-# Check the user's response
+# Add a test suite if requested
 if $ADD_VITEST; then
   npm install -D vitest
 
@@ -113,19 +110,19 @@ else
 fi
 
 
-
+# Open the project in VSCode
 code .
 
+# Run the frontend code in PM2
 pm2 start 'npm run dev' --name devclient
 
+# Wait half a second and then fire up the browser
 sleep .5
-# Waits half a second before firing up the browser
-
 open http://localhost:5173/
 
 
-# At the very end we want to fire up pm2 logs IF we have a server running there
-# as that will give us the server console messages.
+# Fire up PM2 logs if we have a server running there
+# This will give us the server console messages.
 if $ADD_EXPRESS; then
 pm2 logs
 fi
