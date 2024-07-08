@@ -16,11 +16,21 @@ if [ -z "$APP_NAME" ]; then
     exit 1
 fi
 
-read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS
+# Function to check if response is affirmative or empty
+# (this means all responses are Yes by default)
+is_affirmative() {
+    [[ "$1" =~ ^[Yy]$ ]] || [[ -z "$1" ]]
+}
 
-read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES
+# Get user responses
+read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS_RESPONSE
+read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES_RESPONSE
+read -p "Do you to add Vitest for test coverage? (Y/n): " ADD_VITEST_RESPONSE
 
-read -p "Do you to add Vitest for test coverage? (Y/n): " ADD_VITEST
+# Set boolean variables based on responses 
+ADD_EXPRESS=$(is_affirmative "$ADD_EXPRESS_RESPONSE" && echo true || echo false)
+ADD_POSTGRES=$(is_affirmative "$ADD_POSTGRES_RESPONSE" && echo true || echo false)
+ADD_VITEST=$(is_affirmative "$ADD_VITEST_RESPONSE" && echo true || echo false)
 
 npm create vite@latest $APP_NAME -- --template react-swc-ts
 
@@ -29,13 +39,13 @@ cd $APP_NAME
 npm install
 npm init -y
 
+# Clear away any pm2 processes that are already in place and might compete for a PORT slot
 pm2 delete all
-# This clears away any pm2 processes that were already in place and might compete for a PORT slot
 
 
 
 # Check the user's response
-if [ "$ADD_EXPRESS" = "Y" ] || [ "$ADD_EXPRESS" = "y" ] || [ -z "$ADD_EXPRESS" ]; then
+if $ADD_EXPRESS; then
   mkdir server
   cd server
   npm init -y
@@ -58,7 +68,7 @@ fi
 
 
 # Check the user's response
-if [ "$ADD_POSTGRES" = "Y" ] || [ "$ADD_POSTGRES" = "y" ] || [ -z "$ADD_POSTGRES" ]; then
+if $ADD_POSTGRES; then
   docker compose down
   npm install prisma --save-dev
   npx prisma
@@ -80,10 +90,10 @@ fi
 
 
 # Check the user's response
-if [ "$ADD_VITEST" = "Y" ] || [ "$ADD_VITEST" = "y" ] || [ -z "$ADD_VITEST" ]; then
+if $ADD_VITEST; then
   npm install -D vitest
 
-  if [ "$ADD_POSTGRES" = "Y" ] || [ "$ADD_POSTGRES" = "y" ] || [ -z "$ADD_POSTGRES" ]; then
+  if $ADD_POSTGRES; then
   npm install dotenv
   cp ~/bin/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
   cp ~/bin/boilerplate.dotenv.test ./.env.test
@@ -116,6 +126,6 @@ open http://localhost:5173/
 
 # At the very end we want to fire up pm2 logs IF we have a server running there
 # as that will give us the server console messages.
-if [ "$ADD_EXPRESS" = "Y" ] || [ "$ADD_EXPRESS" = "y" ] || [ -z "$ADD_EXPRESS" ]; then
+if $ADD_EXPRESS; then
 pm2 logs
 fi
