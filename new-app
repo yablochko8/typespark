@@ -78,10 +78,8 @@ if $ADD_EXPRESS; then
   mkdir server
   cd server
     npm init -y
-    npm install express
-    npm i --save-dev @types/express
-    npm install cors
-    npm i --save-dev @types/cors
+    npm install express cors
+    npm i --save-dev @types/express @types/cors
     echo "Express server setup completed in the 'server' directory."
     cp ~/bin/boilerplate.server.ts ./server.ts
     echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
