@@ -11,7 +11,7 @@ echo "This is a scrappy web scraper."
 
 read -p "What page do you want to start on? Paste in the URL: " URL_NAME
 
-if [ -z "URL_NAME" ]; then
+if [ -z "$URL_NAME" ]; then
     echo "URL cannot be empty."
     exit 1
 fi
