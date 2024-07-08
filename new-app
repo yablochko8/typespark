@@ -4,6 +4,8 @@ cd ~/fractal-projs/APPS-FROM-SCRIPTS
 
 echo "This script only supports Vite apps."
 
+echo "WARNING: the test suite part of this script is probably broken right now."
+
 read -p "Give the new app a (kebab-case) name: " APP_NAME
 
 if [ -z "$APP_NAME" ]; then
@@ -17,24 +19,54 @@ is_affirmative() {
     [[ "$1" =~ ^[Yy]$ ]] || [[ -z "$1" ]]
 }
 
-# Get user responses
+# Get user responses, and set booleans based on responses
+# Only offer database if user has said yes to a server
 read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS_RESPONSE
-read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES_RESPONSE
-read -p "Do you to add Vitest for test coverage? (Y/n): " ADD_VITEST_RESPONSE
-
-# Set boolean variables based on responses 
 ADD_EXPRESS=$(is_affirmative "$ADD_EXPRESS_RESPONSE" && echo true || echo false)
-ADD_POSTGRES=$(is_affirmative "$ADD_POSTGRES_RESPONSE" && echo true || echo false)
-ADD_VITEST=$(is_affirmative "$ADD_VITEST_RESPONSE" && echo true || echo false)
 
-# Create the frontend project
+if $ADD_EXPRESS; then
+  read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES_RESPONSE
+  ADD_POSTGRES=$(is_affirmative "$ADD_POSTGRES_RESPONSE" && echo true || echo false)
+else
+  ADD_POSTGRES=false
+fi
 
-npm create vite@latest $APP_NAME -- --template react-swc-ts
+# read -p "Do you to add Vitest for test coverage? (Y/n): " ADD_VITEST_RESPONSE
+# ADD_VITEST=$(is_affirmative "$ADD_VITEST_RESPONSE" && echo true || echo false)
+# temporary override
+ADD_VITEST=false
 
-cd $APP_NAME
 
-npm install
-npm init -y
+echo "Building app with:
+ADD_EXPRESS = $ADD_EXPRESS
+ADD_POSTGRES = $ADD_POSTGRES
+ADD_VITEST = $ADD_VITEST
+"
+
+# Create the frontend app
+# If there is going to be a server as well, we want frontend in its own /frontend folder
+# Otherwise we want it at the top level of the project
+if $ADD_EXPRESS; then
+  mkdir $APP_NAME
+  cd $APP_NAME
+  npm create vite@latest frontend -- --template react-swc-ts
+  cd frontend
+  npm install
+  npm init -y
+  cd ..
+else
+  npm create vite@latest $APP_NAME -- --template react-swc-ts
+  cd $APP_NAME
+  npm install
+  npm init -y
+fi
+# PWD at end of a loop like this should always be project parent
+# (e.g. APPS-FROM-SCRIPTS/app-name)
+
+
+# Give the project a good gitignore and blank readme at top level
+  cp ~/bin/boilerplate.dotgitignore ./.gitignore
+  cp ~/bin/boilerplate.README.md ./README.md
 
 # Clear away any pm2 processes that are already in place and might compete for a PORT slot
 pm2 delete all
@@ -45,18 +77,18 @@ pm2 delete all
 if $ADD_EXPRESS; then
   mkdir server
   cd server
-  npm init -y
-  npm install express
-  npm i --save-dev @types/express
-  npm install cors
-  npm i --save-dev @types/cors
-  echo "Express server setup completed in the 'server' directory."
-  cp ~/bin/boilerplate.server.ts ./server.ts
-  echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
-  pm2 start 'bun --watch server.ts' --name devserver
+    npm init -y
+    npm install express
+    npm i --save-dev @types/express
+    npm install cors
+    npm i --save-dev @types/cors
+    echo "Express server setup completed in the 'server' directory."
+    cp ~/bin/boilerplate.server.ts ./server.ts
+    echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
+    pm2 start 'bun --watch server.ts' --name devserver
   cd ..
-  cp ~/bin/boilerplate.App.tsx ./src/App.tsx
-  echo "Boilerplate client file updated with server routes in 'app-name/src/App.tsx'."
+  cp ~/bin/boilerplate.App.tsx frontend/src/App.tsx
+  echo "Boilerplate client file updated with server routes in '$APP_NAME/frontend/src/App.tsx'."
 else
   echo "Express server setup skipped."
 fi
@@ -66,18 +98,26 @@ fi
 
 # Add a database if requested
 if $ADD_POSTGRES; then
-  docker compose down
-  npm install prisma --save-dev
-  npx prisma
-  npx prisma init
-  cp ~/bin/boilerplate.docker-compose.yml ./docker-compose.yml
-  echo "Boilerplate Docker yml files added."
-  cp ~/bin/boilerplate.dotenv ./.env
-  cp ~/bin/boilerplate.dotenv.test ./.env.test
-  cp ~/bin/boilerplate.schema.prisma ./prisma/schema.prisma
-  npx prisma migrate dev --name initial-setup --force
-  docker compose up
-  pm2 start 'npx prisma studio' --name prismastudio
+  cd server
+    # Add docker compose template
+    docker compose down
+    cp ~/bin/boilerplate.docker-compose.yml ./docker-compose.yml
+    echo "Boilerplate Docker yml files added."
+
+    # Add Prisma and schema boilerplates
+    npm install prisma --save-dev
+    npx prisma init
+    cp ~/bin/boilerplate.dotenv ./.env
+    cp ~/bin/boilerplate.dotenv.test ./.env.test
+    cp ~/bin/boilerplate.schema.prisma ./prisma/schema.prisma
+
+    # Migrate schema and fire up in Docker. Keep this verbose it has caused hiccups in the past. 
+    echo "============ running prisma migrate dev ============"
+    npx prisma migrate dev --name initial-setup --force
+    echo "============ running docker compose up in detached mode ============"
+    docker compose up -d
+    pm2 start 'npx prisma studio' --name prismastudio
+  cd ..
 
 else
   echo "Postgres setup skipped."
@@ -87,6 +127,7 @@ fi
 
 
 # Add a test suite if requested
+# PROBABLY BROKEN RIGHT NOW
 if $ADD_VITEST; then
   npm install -D vitest
 
@@ -114,7 +155,15 @@ fi
 code .
 
 # Run the frontend code in PM2
-pm2 start 'npm run dev' --name devclient
+if $ADD_EXPRESS; then
+  cd frontend
+    pm2 start 'npm run dev' --name devclient
+  cd ..
+else
+  pm2 start 'npm run dev' --name devclient
+fi
+
+
 
 # Wait half a second and then fire up the browser
 sleep .5
@@ -126,3 +175,20 @@ open http://localhost:5173/
 if $ADD_EXPRESS; then
 pm2 logs
 fi
+
+
+
+
+
+
+
+
+# TO DO
+#
+#
+# Add a better .env default and .env.example
+#
+# Make README.md boilerplate better
+#
+# Fix the test suite part of this script so it works again with new folder structure.
+#
