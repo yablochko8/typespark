@@ -20,5 +20,3 @@ You should now be able to run the command `new-app` and have it work. By default
 If the command doesn't work, you may need to give the script executable permissions:
 
 `chmod +x ~/bin/new-app`
-
-I can now run `new-app thing` in shell and echoes back to me love for thing.
