@@ -41,6 +41,7 @@ function App() {
 
   return (
     <>
+      <div>Open the browser console to see this working.</div>
       <button onClick={() => getData()}>Call the GET Endpoint</button>
       <br />
       <br />
