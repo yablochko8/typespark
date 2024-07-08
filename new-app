@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ~/fractal-projs/APPS-FROM-SCRIPTS
+mkdir -p ~/fractal-projs/APPS-FROM-SCRIPTS && cd ~/fractal-projs/APPS-FROM-SCRIPTS
 
 echo "This script only supports Vite apps."
 
