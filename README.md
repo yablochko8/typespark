@@ -7,7 +7,7 @@
    (if that file doesn't exist for you you'll need to find a different way to add to system path)
 1. Add this as a new first line to the config file you're editing:
    `export PATH="$HOME/bin:$PATH"`
-1. Restart Terminal, and confirm path is updated by trying using:
+1. Restart Terminal, and confirm path is updated:
    `echo $PATH`
 1. Open this ~/bin folder in VS Code / Cursor, and clone this repo in Terminal:
    `git clone https://github.com/fractal-bootcamp/lui.shell-scripts`
