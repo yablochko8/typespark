@@ -8,7 +8,7 @@
    `export PATH="$HOME/bin:$PATH"`
 1. Restart Terminal, and confirmed path is updated using:
    `echo $PATH`
-1. Opened up ~/bin in VSCode and added a new file called new-app
+1. I cloned this repo to ~/bin. In theory, any file at the top level of this project can be called from Shell in th. In practice, the only ones I call are `new-app` and `scrape-web`.
 
 ```bash
 #!/bin/bash
