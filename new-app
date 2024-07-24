@@ -20,6 +20,11 @@ is_affirmative() {
 }
 
 # Get user responses, and set booleans based on responses
+
+read -p "Do you want to use Tailwind for styling? (Y/n): " ADD_TAILWIND_RESPONSE
+ADD_TAILWIND=$(is_affirmative "$ADD_TAILWIND_RESPONSE" && echo true || echo false)
+
+
 # Only offer database if user has said yes to a server
 read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS_RESPONSE
 ADD_EXPRESS=$(is_affirmative "$ADD_EXPRESS_RESPONSE" && echo true || echo false)
@@ -38,35 +43,39 @@ ADD_VITEST=false
 
 
 echo "Building app with:
+ADD_TAILWIND = $ADD_TAILWIND
 ADD_EXPRESS = $ADD_EXPRESS
 ADD_POSTGRES = $ADD_POSTGRES
 ADD_VITEST = $ADD_VITEST
 "
 
+# Create the app folder and jump into it
+mkdir $APP_NAME
+cd $APP_NAME
+
 # Create the frontend app
 # If there is going to be a server as well, we want frontend in its own /frontend folder
 # Otherwise we want it at the top level of the project
 if $ADD_EXPRESS; then
-  mkdir $APP_NAME
-  cd $APP_NAME
-  npm create vite@latest frontend -- --template react-swc-ts
+  mkdir frontend
   cd frontend
-  npm install
-  npm init -y
-  cd ..
-else
-  npm create vite@latest $APP_NAME -- --template react-swc-ts
-  cd $APP_NAME
-  npm install
-  npm init -y
 fi
+
+npm create vite@latest . -- --template react-swc-ts
+npm install
+npm init -y
+
+if $ADD_EXPRESS; then
+  cd ..
+fi
+
 # PWD at end of a loop like this should always be project parent
 # (e.g. APPS-FROM-SCRIPTS/app-name)
 
 
 # Give the project a good gitignore and blank readme at top level
-  cp ~/bin/boilerplate.dotgitignore ./.gitignore
-  cp ~/bin/boilerplate.README.md ./README.md
+cp ~/bin/boilerplate.dotgitignore ./.gitignore
+cp ~/bin/boilerplate.README.md ./README.md
 
 # Clear away any pm2 processes that are already in place and might compete for a PORT slot
 pm2 delete all
