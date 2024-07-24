@@ -65,6 +65,25 @@ npm create vite@latest . -- --template react-swc-ts
 npm install
 npm init -y
 
+if $ADD_TAILWIND; then
+  # These track steps here https://tailwindcss.com/docs/guides/vite as of 2024-07-24
+  npm install -D tailwindcss postcss autoprefixer
+  npx tailwindcss init -p
+  cp ~/bin/boilerplate.tailwind.config.js ./tailwind.config.js
+
+# The sed command (to prepend text to a file) is finecky. This only works on Mac.
+  sed -i '' '1i\
+@tailwind base;\
+@tailwind components;\
+@tailwind utilities;\
+' src/index.css
+
+  echo "Tailwind CSS setup completed."
+else
+  echo "Tailwind CSS setup skipped."
+fi
+
+
 if $ADD_EXPRESS; then
   cd ..
 fi
