@@ -13,17 +13,18 @@
    `git clone https://github.com/fractal-bootcamp/lui.shell-scripts`
 1. In theory, any file at the top level of this project can be called from Shell. In practice, the only ones I call are `new-app` and `scrape-web`.
 
-You should now be able to run the command `new-app` and have it work. By default, it will store all new projects to `~/fractal-projs/APPS-FROM-SCRIPTS`.
+You should now be able to run the command `typespark` and have it work. By default, it will store all new projects to `~/typespark-apps`.
 
 ## Troubleshooting
 
 If the command doesn't work, you may need to give the script executable permissions:
 
-`chmod +x ~/bin/new-app`
+`chmod +x ~/bin/typespark`
 
 ## Backlog (i.e. NOT built yet)
 
 1. Investigate/fix the tailwind warnings that sometimes appear.
 1. Better script commmunication: don't run them automatically, show them in echo messages. Add them to the project README.
 1. Wrap this script in a JS command so that it can be called by npx, for now just check for Mac and error out if non Mac
+1. For full-stack projects add a shared folder at parent level (for types etc) by default
 1. Add support for non-Mac.
