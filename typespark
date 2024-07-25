@@ -12,11 +12,16 @@ echo "
        __/ | |                | |                    
       |___/|_|                |_|                    
 "
-echo "This script will create a new folder in ~/typespark-apps."
-echo "That folder will contain a Vite app."
+echo "That script will bring to life a new TypeScript project."
+echo ""
+echo "Project will contain:"
+echo "- frontend app, created with Vite template"
+echo "- server using Express (optional), and"
+echo "- database setup using Prisma & Postgres (optional)"
+echo ""
+echo "Project will appear in a new folder in ~/typespark-apps."
 echo "It only works on Mac."
-
-echo "WARNING: the test suite part of this script is probably broken right now."
+echo ""
 
 read -p "Give the new app a name: " APP_NAME_INPUT
 
