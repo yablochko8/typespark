@@ -41,6 +41,10 @@ fi
 # temporary override
 ADD_VITEST=false
 
+# Define the path to the boilerplate files
+BOILERPLATE_PATH=~/bin
+
+
 
 echo "Building app with:
 ADD_TAILWIND = $ADD_TAILWIND
@@ -69,7 +73,7 @@ if $ADD_TAILWIND; then
   # These track steps here https://tailwindcss.com/docs/guides/vite as of 2024-07-24
   npm install -D tailwindcss postcss autoprefixer
   npx tailwindcss init -p
-  cp ~/bin/boilerplate.tailwind.config.js ./tailwind.config.js
+  cp $BOILERPLATE_PATH/boilerplate.tailwind.config.js ./tailwind.config.js
 
 # The sed command (to prepend text to a file) is finecky. This only works on Mac.
   sed -i '' '1i\
@@ -93,8 +97,8 @@ fi
 
 
 # Give the project a good gitignore and blank readme at top level
-cp ~/bin/boilerplate.dotgitignore ./.gitignore
-cp ~/bin/boilerplate.README.md ./README.md
+cp $BOILERPLATE_PATH/boilerplate.dotgitignore ./.gitignore
+cp $BOILERPLATE_PATH/boilerplate.README.md ./README.md
 
 # Clear away any pm2 processes that are already in place and might compete for a PORT slot
 pm2 delete all
@@ -109,11 +113,11 @@ if $ADD_EXPRESS; then
     npm install express cors
     npm i --save-dev @types/express @types/cors
     echo "Express server setup completed in the 'server' directory."
-    cp ~/bin/boilerplate.server.ts ./server.ts
+    cp $BOILERPLATE_PATH/boilerplate.server.ts ./server.ts
     echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
     pm2 start 'bun --watch server.ts' --name devserver
   cd ..
-  cp ~/bin/boilerplate.App.tsx frontend/src/App.tsx
+  cp $BOILERPLATE_PATH/boilerplate.App.tsx frontend/src/App.tsx
   echo "Boilerplate client file updated with server routes in '$APP_NAME/frontend/src/App.tsx'."
 else
   echo "Express server setup skipped."
@@ -127,15 +131,15 @@ if $ADD_POSTGRES; then
   cd server
     # Add docker compose template
     docker compose down
-    cp ~/bin/boilerplate.docker-compose.yml ./docker-compose.yml
+    cp $BOILERPLATE_PATH/boilerplate.docker-compose.yml ./docker-compose.yml
     echo "Boilerplate Docker yml files added."
 
     # Add Prisma and schema boilerplates
     npm install prisma --save-dev
     npx prisma init
-    cp ~/bin/boilerplate.dotenv ./.env
-    cp ~/bin/boilerplate.dotenv.test ./.env.test
-    cp ~/bin/boilerplate.schema.prisma ./prisma/schema.prisma
+    cp $BOILERPLATE_PATH/boilerplate.dotenv ./.env
+    cp $BOILERPLATE_PATH/boilerplate.dotenv.test ./.env.test
+    cp $BOILERPLATE_PATH/boilerplate.schema.prisma ./prisma/schema.prisma
 
     # Migrate schema and fire up in Docker. Keep this verbose it has caused hiccups in the past. 
     echo "============ running prisma migrate dev ============"
@@ -159,8 +163,8 @@ if $ADD_VITEST; then
 
   if $ADD_POSTGRES; then
   npm install dotenv
-  cp ~/bin/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
-  cp ~/bin/boilerplate.dotenv.test ./.env.test
+  cp $BOILERPLATE_PATH/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
+  cp $BOILERPLATE_PATH/boilerplate.dotenv.test ./.env.test
   npm pkg set scripts.test:env="npx dotenv -e .env.test vitest"
   npm pkg set scripts.test:server:up="pm2 start 'bun server/server.ts' --name testserver"
   npm pkg set scripts.test:server:down="pm2 delete testserver"
