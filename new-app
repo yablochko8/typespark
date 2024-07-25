@@ -42,7 +42,7 @@ fi
 ADD_VITEST=false
 
 # Define the path to the boilerplate files
-BOILERPLATE_PATH=~/bin
+BOILERPLATE_PATH=~/bin/boilerplates
 
 
 
