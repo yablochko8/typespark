@@ -1,12 +1,48 @@
 #!/bin/bash
 
-mkdir -p ~/fractal-projs/APPS-FROM-SCRIPTS && cd ~/fractal-projs/APPS-FROM-SCRIPTS
+mkdir -p ~/typespark-apps && cd ~/typespark-apps
 
-echo "This script only supports Vite apps."
+echo "
+ _______                 _____                  _    
+|__   __|               / ____|                | |   
+   | |_   _ _ __   ___ | (___  _ __   __ _ _ __| | __
+   | | | | | '_ \ / _ \ \___ \| '_ \ / _\` | '__| |/ /
+   | | |_| | |_) |  __/ ____) | |_) | (_| | |  |   < 
+   |_|\__, | .__/ \___||_____/| .__/ \__,_|_|  |_|\_\\
+       __/ | |                | |                    
+      |___/|_|                |_|                    
+"
+echo "That script will bring to life a new TypeScript project."
+echo ""
+echo "Project will contain:"
+echo "- frontend app, created with Vite template"
+echo "- server using Express (optional), and"
+echo "- database setup using Prisma & Postgres (optional)"
+echo ""
+echo "Project will appear in a new folder in ~/typespark-apps."
+echo "It only works on Mac."
+echo ""
 
-echo "WARNING: the test suite part of this script is probably broken right now."
+read -p "Give the new app a name: " APP_NAME_INPUT
 
-read -p "Give the new app a (kebab-case) name: " APP_NAME
+
+APP_NAME=$(echo "$APP_NAME_INPUT" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g')
+
+if [ "$APP_NAME" != "$APP_NAME_INPUT" ]; then
+    echo "Name sanitized to: $APP_NAME"
+fi
+
+# Check if directory exists, if so, ask user if they want to overwrite
+if [ -d "$APP_NAME" ]; then
+    read -p "Directory $APP_NAME already exists. Do you want to overwrite it? (y/N): " OVERWRITE
+    if [[ $OVERWRITE =~ ^[Yy]$ ]]; then
+        rm -rf "$APP_NAME"
+    else
+        echo "Exiting. Please choose a different app name."
+        exit 1
+    fi
+fi
+
 
 if [ -z "$APP_NAME" ]; then
     echo "App name cannot be empty."
@@ -41,6 +77,10 @@ fi
 # temporary override
 ADD_VITEST=false
 
+# Define the path to the boilerplate files
+BOILERPLATE_PATH=~/bin/boilerplates
+
+
 
 echo "Building app with:
 ADD_TAILWIND = $ADD_TAILWIND
@@ -69,7 +109,7 @@ if $ADD_TAILWIND; then
   # These track steps here https://tailwindcss.com/docs/guides/vite as of 2024-07-24
   npm install -D tailwindcss postcss autoprefixer
   npx tailwindcss init -p
-  cp ~/bin/boilerplate.tailwind.config.js ./tailwind.config.js
+  cp $BOILERPLATE_PATH/boilerplate.tailwind.config.js ./tailwind.config.js
 
 # The sed command (to prepend text to a file) is finecky. This only works on Mac.
   sed -i '' '1i\
@@ -93,8 +133,8 @@ fi
 
 
 # Give the project a good gitignore and blank readme at top level
-cp ~/bin/boilerplate.dotgitignore ./.gitignore
-cp ~/bin/boilerplate.README.md ./README.md
+cp $BOILERPLATE_PATH/boilerplate.dotgitignore ./.gitignore
+cp $BOILERPLATE_PATH/boilerplate.README.md ./README.md
 
 # Clear away any pm2 processes that are already in place and might compete for a PORT slot
 pm2 delete all
@@ -109,11 +149,11 @@ if $ADD_EXPRESS; then
     npm install express cors
     npm i --save-dev @types/express @types/cors
     echo "Express server setup completed in the 'server' directory."
-    cp ~/bin/boilerplate.server.ts ./server.ts
+    cp $BOILERPLATE_PATH/boilerplate.server.ts ./server.ts
     echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
     pm2 start 'bun --watch server.ts' --name devserver
   cd ..
-  cp ~/bin/boilerplate.App.tsx frontend/src/App.tsx
+  cp $BOILERPLATE_PATH/boilerplate.App.tsx frontend/src/App.tsx
   echo "Boilerplate client file updated with server routes in '$APP_NAME/frontend/src/App.tsx'."
 else
   echo "Express server setup skipped."
@@ -127,15 +167,15 @@ if $ADD_POSTGRES; then
   cd server
     # Add docker compose template
     docker compose down
-    cp ~/bin/boilerplate.docker-compose.yml ./docker-compose.yml
+    cp $BOILERPLATE_PATH/boilerplate.docker-compose.yml ./docker-compose.yml
     echo "Boilerplate Docker yml files added."
 
     # Add Prisma and schema boilerplates
     npm install prisma --save-dev
     npx prisma init
-    cp ~/bin/boilerplate.dotenv ./.env
-    cp ~/bin/boilerplate.dotenv.test ./.env.test
-    cp ~/bin/boilerplate.schema.prisma ./prisma/schema.prisma
+    cp $BOILERPLATE_PATH/boilerplate.dotenv ./.env
+    cp $BOILERPLATE_PATH/boilerplate.dotenv.test ./.env.test
+    cp $BOILERPLATE_PATH/boilerplate.schema.prisma ./prisma/schema.prisma
 
     # Migrate schema and fire up in Docker. Keep this verbose it has caused hiccups in the past. 
     echo "============ running prisma migrate dev ============"
@@ -159,8 +199,8 @@ if $ADD_VITEST; then
 
   if $ADD_POSTGRES; then
   npm install dotenv
-  cp ~/bin/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
-  cp ~/bin/boilerplate.dotenv.test ./.env.test
+  cp $BOILERPLATE_PATH/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
+  cp $BOILERPLATE_PATH/boilerplate.dotenv.test ./.env.test
   npm pkg set scripts.test:env="npx dotenv -e .env.test vitest"
   npm pkg set scripts.test:server:up="pm2 start 'bun server/server.ts' --name testserver"
   npm pkg set scripts.test:server:down="pm2 delete testserver"
