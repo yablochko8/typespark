@@ -20,3 +20,10 @@ You should now be able to run the command `new-app` and have it work. By default
 If the command doesn't work, you may need to give the script executable permissions:
 
 `chmod +x ~/bin/new-app`
+
+## Backlog (i.e. NOT built yet)
+
+1. Investigate/fix the tailwind warnings that sometimes appear.
+1. Better script commmunication: don't run them automatically, show them in echo messages. Add them to the project README.
+1. Wrap this script in a JS command so that it can be called by npx, for now just check for Mac and error out if non Mac
+1. Add support for non-Mac.
