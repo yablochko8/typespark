@@ -1,7 +1,5 @@
 #!/bin/bash
 
-mkdir -p ~/typespark-apps && cd ~/typespark-apps
-
 echo "
  _______                 _____                  _    
 |__   __|               / ____|                | |   
@@ -19,8 +17,8 @@ echo "- frontend app, created with Vite template"
 echo "- server using Express (optional), and"
 echo "- database setup using Prisma & Postgres (optional)"
 echo ""
-echo "Project will appear in a new folder in ~/typespark-apps."
-echo "It only works on Mac."
+echo "Project will appear in a new folder with your app name."
+echo "Currently only works on Mac."
 echo ""
 
 read -p "Give the new app a name: " APP_NAME_INPUT
@@ -243,20 +241,3 @@ pm2 logs
 fi
 
 
-
-
-
-
-
-
-# TO DO
-#
-#
-# Add a better .env default and .env.example
-#
-# Make README.md boilerplate better
-#
-# Fix the test suite part of this script so it works again with new folder structure.
-#
-# Give the app a script that lets you fire up all created elements using pm2 at a later stage, and then use that in this script.
-#
