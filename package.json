@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "description": "Boilerplate scripts for bringing new full-stack TypeScript projects to life.",
   "main": "index.js",
+  "bin": {
+    "typespark.sh": "./index.js"
+  },
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

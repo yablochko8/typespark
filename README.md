@@ -21,6 +21,8 @@ If the command doesn't work, you may need to give the script executable permissi
 
 `chmod +x ~/bin/typespark`
 
+PM2 shows the most recent error logs when you fire it up. This can sometimes be confusing. Use `pm2 flush` to clear out this noise.
+
 ## Backlog (i.e. NOT built yet)
 
 1. Investigate/fix the tailwind warnings that sometimes appear.

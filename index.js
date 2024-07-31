@@ -1,19 +1,23 @@
 #!/usr/bin/env node
 
-import { exec } from "child_process";
+console.log("Hello, world!");
 
-const command = "typespark";
+const { spawn } = require("child_process");
+const path = require("path");
+const os = require("os");
 
-exec(command, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error executing command: ${error.message}`);
-    return;
-  }
+if (os.platform() !== "darwin") {
+  console.log("This script is only supported on macOS.");
+  process.exit(1);
+}
 
-  if (stderr) {
-    console.error(`Error: ${stderr}`);
-    return;
-  }
+const scriptPath = path.join(__dirname, "typespark");
+const child = spawn("bash", [scriptPath], {
+  stdio: "inherit",
+});
 
-  console.log(`Output: ${stdout}`);
+child.on("exit", function (code, signal) {
+  console.log(
+    "child process exited with " + `code ${code} and signal ${signal}`
+  );
 });
