@@ -13,7 +13,9 @@ All responses are Yes by default.
 
 ## Troubleshooting
 
-If you don't have PM2 installed.
+If you don't have PM2 installed some conveniences won't work, i.e. the app won't autoload. This will give a minor error message but it's fine.
+
+(PM2 lets you run multiple Node.js applications from a single Terminal window, with a combined view of all their console logs.)
 
 PM2 shows the most recent error logs when you fire it up. This can sometimes be confusing. Use `pm2 flush` to clear out this noise.
 
