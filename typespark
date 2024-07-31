@@ -10,7 +10,7 @@ echo "
        __/ | |                | |                    
       |___/|_|                |_|                    
 "
-echo "That script will bring to life a new TypeScript project."
+echo "This script will bring to life a new TypeScript project."
 echo ""
 echo "Project will contain:"
 echo "- frontend app, created with Vite template"
