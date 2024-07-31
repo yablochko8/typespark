@@ -1,0 +1,24 @@
+{
+  "name": "typespark",
+  "version": "0.1.0",
+  "description": "Boilerplate scripts for bringing new full-stack TypeScript projects to life.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yablochko8/typespark.git"
+  },
+  "keywords": [
+    "typescript",
+    "express",
+    "boilerplate"
+  ],
+  "author": "Lui Smyth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yablochko8/typespark/issues"
+  },
+  "homepage": "https://github.com/yablochko8/typespark#readme"
+}
