@@ -23,10 +23,18 @@ If the command doesn't work, you may need to give the script executable permissi
 
 PM2 shows the most recent error logs when you fire it up. This can sometimes be confusing. Use `pm2 flush` to clear out this noise.
 
-## Backlog (i.e. NOT built yet)
+## Future Features
 
-1. Investigate/fix the tailwind warnings that sometimes appear.
+### Upcoming Priorities
+
+1. Store in pwd, not ~/typespark
 1. Better script commmunication: don't run them automatically, show them in echo messages. Add them to the project README.
-1. Wrap this script in a JS command so that it can be called by npx, for now just check for Mac and error out if non Mac
 1. For full-stack projects add a shared folder at parent level (for types etc) by default
+1. Add a better .env default and .env.example
+1. Make README.md boilerplate better
+1. Give the app a script that lets you fire up all created elements using pm2 at a later stage, and then use that in this script.
+
+### Low Priority
+
 1. Add support for non-Mac.
+1. Fix the test suite part of this script so it works again with new folder structure.
