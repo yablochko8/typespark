@@ -31,5 +31,5 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 
 ### Low Priority
 
-1. Add support for non-Mac.
+1. Add support for non-Mac (although it may be only the Tailwind sed command that breaks on non-Mac)
 1. Fix the test suite part of this script so it works again with the varied folder structure.

@@ -23,7 +23,7 @@ echo ""
 
 read -p "Give the new app a name: " APP_NAME_INPUT
 
-
+# Transform app name to sanitized-snake-case
 APP_NAME=$(echo "$APP_NAME_INPUT" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g')
 
 if [ "$APP_NAME" != "$APP_NAME_INPUT" ]; then
@@ -41,7 +41,7 @@ if [ -d "$APP_NAME" ]; then
     fi
 fi
 
-
+# Make sure the app name is not empty
 if [ -z "$APP_NAME" ]; then
     echo "App name cannot be empty."
     exit 1
@@ -54,15 +54,13 @@ is_affirmative() {
 }
 
 # Get user responses, and set booleans based on responses
-
 read -p "Do you want to use Tailwind for styling? (Y/n): " ADD_TAILWIND_RESPONSE
 ADD_TAILWIND=$(is_affirmative "$ADD_TAILWIND_RESPONSE" && echo true || echo false)
 
-
-# Only offer database if user has said yes to a server
 read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS_RESPONSE
 ADD_EXPRESS=$(is_affirmative "$ADD_EXPRESS_RESPONSE" && echo true || echo false)
 
+# Only offer a database if user has said yes to a server
 if $ADD_EXPRESS; then
   read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES_RESPONSE
   ADD_POSTGRES=$(is_affirmative "$ADD_POSTGRES_RESPONSE" && echo true || echo false)
@@ -76,9 +74,7 @@ fi
 ADD_VITEST=false
 
 # Define the path to the boilerplate files
-BOILERPLATE_PATH=~/bin/boilerplates
-
-
+BOILERPLATE_PATH="$(dirname "$0")/boilerplates"
 
 echo "Building app with:
 ADD_TAILWIND = $ADD_TAILWIND
@@ -91,13 +87,30 @@ ADD_VITEST = $ADD_VITEST
 mkdir $APP_NAME
 cd $APP_NAME
 
-# Create the frontend app
+# Give the project a good gitignore and blank readme at top level
+cp $BOILERPLATE_PATH/boilerplate.dotgitignore ./.gitignore
+cp $BOILERPLATE_PATH/boilerplate.README.md ./README.md
+
+# Define the full path of the project folder and the frontend (which may be the same)
+PROJECT_FOLDER=$(pwd)
+
 # If there is going to be a server as well, we want frontend in its own /frontend folder
 # Otherwise we want it at the top level of the project
 if $ADD_EXPRESS; then
   mkdir frontend
   cd frontend
+  FRONTEND_FOLDER=$(pwd)
+else
+  FRONTEND_FOLDER=$PROJECT_FOLDER
 fi
+
+
+
+#######################################################################
+# CREATE THE FRONTEND APP
+#######################################################################
+
+cd $FRONTEND_FOLDER
 
 npm create vite@latest . -- --template react-swc-ts
 npm install
@@ -121,23 +134,16 @@ else
   echo "Tailwind CSS setup skipped."
 fi
 
+cd $PROJECT_FOLDER
 
-if $ADD_EXPRESS; then
-  cd ..
-fi
-
-# PWD at end of a loop like this should always be project parent
-# (e.g. APPS-FROM-SCRIPTS/app-name)
+# PWD at end of a loop like this should always be $PROJECT_FOLDER
+# (i.e. STARTING-FOLDER/$APP_NAME)
 
 
-# Give the project a good gitignore and blank readme at top level
-cp $BOILERPLATE_PATH/boilerplate.dotgitignore ./.gitignore
-cp $BOILERPLATE_PATH/boilerplate.README.md ./README.md
 
-# Clear away any pm2 processes that are already in place and might compete for a PORT slot
-pm2 delete all
-
-
+#######################################################################
+# CREATE THE SERVER AND DATABASE
+#######################################################################
 
 # Add an express server if requested
 if $ADD_EXPRESS; then
@@ -156,9 +162,6 @@ if $ADD_EXPRESS; then
 else
   echo "Express server setup skipped."
 fi
-
-
-
 
 # Add a database if requested
 if $ADD_POSTGRES; then
@@ -189,9 +192,12 @@ fi
 
 
 
+#######################################################################
+# ADD A TEST SUITE - CURRENTLY NOT USED
+#######################################################################
 
 # Add a test suite if requested
-# PROBABLY BROKEN RIGHT NOW
+# BROKEN RIGHT NOW AND THUS NOT CALLED
 if $ADD_VITEST; then
   npm install -D vitest
 
@@ -215,6 +221,14 @@ else
 fi
 
 
+
+#######################################################################
+# SCRIPTS AND INITIATION
+#######################################################################
+
+# Clear away any pm2 processes that are already in place and might compete for a PORT slot
+pm2 delete all
+
 # Open the project in VSCode
 code .
 
@@ -227,8 +241,6 @@ else
   pm2 start 'npm run dev' --name devclient
 fi
 
-
-
 # Wait half a second and then fire up the browser
 sleep .5
 open http://localhost:5173/
@@ -239,5 +251,3 @@ open http://localhost:5173/
 if $ADD_EXPRESS; then
 pm2 logs
 fi
-
-
