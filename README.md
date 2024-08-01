@@ -2,7 +2,7 @@ Typespark is designed to get your TypeScript project started as fast as possible
 
 Just run `npx typespark` when in your projects folder, that's all you need to remember.
 
-You'll be prompted to provide a name and answer 3 yes/no questions. After the project is set up there is also an option of launching it. This will launch frontend, server, and a database navigator (prisma studio) all in one go, and provide a shared console for all three.
+You'll be prompted to provide a name and answer 3 yes/no questions. After the project is set up there is also an option of launching it. This will launch frontend, server, and a database navigator (prisma studio) all in one go, and provide a shared console for all three (though the frontend runtime logging will still only happen in browser).
 
 Everything else is taken care of. All these annoying things you usually have to do when starting a new project:
 
