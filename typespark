@@ -237,11 +237,11 @@ if $ADD_EXPRESS; then
   RUN_SERVER="bun --watch server/server.ts"
   RUN_FRONTEND_PM2="pm2 start '$RUN_FRONTEND' --name devclient"
   RUN_SERVER_PM2="pm2 start '$RUN_SERVER' --name devserver"
-  RUN_ALL="$RUN_FRONTEND_PM2 && $RUN_SERVER_PM2 && pm2 logs"
+  RUN_ALL="$RUN_FRONTEND_PM2 && $RUN_SERVER_PM2"
   if $ADD_POSTGRES; then
-    RUN_DB_STUDIO="npx --prefix server prisma studio"
+    RUN_DB_STUDIO="npx --prefix ./server prisma studio --schema ./server/prisma/schema.prisma"
     RUN_DB_PM2="pm2 start '$RUN_DB_STUDIO' --name prismastudio"
-    RUN_ALL="$RUN_ALL && $RUN_DB_PM2 && pm2 logs"
+    RUN_ALL="$RUN_ALL && $RUN_DB_PM2"
   fi
   RUN_ALL="pm2 delete all && $RUN_ALL && pm2 logs"
 else
@@ -276,8 +276,7 @@ echo_record_primary() {
 # Share commands with the user & README
 echo ""
 echo -e "${BOLD}Project creation complete.${NORMAL}"
-echo "All the below scripts should be run from the project root directory."
-echo "They are also saved in README.md"
+echo "These scripts should be run from the project's root directory."
 echo_record_standard ""
 echo_record_standard "------------------------"
 echo_record_standard ""
@@ -302,10 +301,19 @@ echo_record_standard "The command for firing up everything is:"
 echo_record_primary "$RUN_ALL"
 echo_record_standard ""
 
-# Open the project in VSCode
-code .
 
-echo -e "${GREEN}Typespark creation process for $APP_NAME complete. Enjoy!${NORMAL}"
+echo "These scripts are saved in the project's README.md"
+echo -ne "${GREEN}Typespark process complete! Would you like to fire everything up now? (Y/n): ${NORMAL}"
+read FIRST_OPEN_RESPONSE
+FIRST_OPEN=$(is_affirmative "$FIRST_OPEN_RESPONSE" && echo true || echo false)
+
+if $FIRST_OPEN; then
+  # Open the project in VSCode
+  code .
+  # Run the command the fires up everything
+  eval $RUN_ALL
+fi
+
 
 
 # # Auto-browser open removed because of port confusion

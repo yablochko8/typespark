@@ -23,7 +23,9 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 
 ### High Priority
 
-1. Needs better end-of-script commmunication: don't run them automatically, show them in echo messages. Add them to the project README. Give the OPTION of firing up everything in one go.
+1. Fix Tailwind errors in client console:
+   0|devclient | warn - No utility classes were detected in your source files. If this is unexpected, double-check the `content` option in your Tailwind CSS configuration.
+   0|devclient | warn - https://tailwindcss.com/docs/content-configuration
 1. For full-stack projects we need a shared folder at parent level (for types etc) by default
 1. Add a better .env default and .env.example
 1. Make README.md boilerplate better
