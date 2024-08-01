@@ -234,16 +234,16 @@ fi
 # lives at the very top, which seems wrong.
 if $ADD_EXPRESS; then
   RUN_FRONTEND="npm --prefix frontend run dev"
-  RUN_SERVER="bun --watch server/server.ts"
+  RUN_SERVER="cd server && bun --watch server.ts && cd .."
   RUN_FRONTEND_PM2="pm2 start '$RUN_FRONTEND' --name devclient"
   RUN_SERVER_PM2="pm2 start '$RUN_SERVER' --name devserver"
   RUN_ALL="$RUN_FRONTEND_PM2 && $RUN_SERVER_PM2"
   if $ADD_POSTGRES; then
-    RUN_DB_STUDIO="npx --prefix ./server prisma studio --schema ./server/prisma/schema.prisma"
+    RUN_DB_STUDIO="cd server && npx --prefix ./server prisma studio --schema ./prisma/schema.prisma && cd .."
     RUN_DB_PM2="pm2 start '$RUN_DB_STUDIO' --name prismastudio"
     RUN_ALL="$RUN_ALL && $RUN_DB_PM2"
   fi
-  RUN_ALL="pm2 delete all && $RUN_ALL && pm2 logs"
+  RUN_ALL="pm2 delete all || true && $RUN_ALL && pm2 logs"
 else
   RUN_FRONTEND="npm run dev"
   RUN_ALL=$RUN_FRONTEND
