@@ -160,7 +160,7 @@ if $ADD_EXPRESS; then
     echo "Express server setup completed in the 'server' directory."
     cp $BOILERPLATE_PATH/boilerplate.server.ts ./server.ts
     echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
-    pm2 start 'bun --watch server.ts' --name devserver
+
   cd ..
   cp $BOILERPLATE_PATH/boilerplate.App.tsx frontend/src/App.tsx
   echo "Boilerplate client file updated with server routes in '$APP_NAME/frontend/src/App.tsx'."
@@ -225,15 +225,16 @@ else
 fi
 
 
-
 #######################################################################
 # SCRIPTS AND INITIATION
 #######################################################################
 
 # Define the commands to run the frontend and server
+# FOR CONSIDERATION: This may break some .env handling, unless it all
+# lives at the very top, which seems wrong.
 if $ADD_EXPRESS; then
   RUN_FRONTEND="npm --prefix frontend run dev"
-  RUN_SERVER="npm --prefix server run dev"
+  RUN_SERVER="bun --watch server/server.ts"
   RUN_FRONTEND_PM2="pm2 start '$RUN_FRONTEND' --name devclient"
   RUN_SERVER_PM2="pm2 start '$RUN_SERVER' --name devserver"
   RUN_ALL="$RUN_FRONTEND_PM2 && $RUN_SERVER_PM2 && pm2 logs"
@@ -264,12 +265,12 @@ echo_record_standard() {
 
 echo_record_command() {
   echo -e "${CYAN_BOLD}$1${NORMAL}"
-  echo "$1" >> README.md
+  echo "\`$1\`" >> README.md
 }
 
 echo_record_primary() {
   echo -e "${MAGENTA_BOLD}$1${NORMAL}"
-  echo "$1" >> README.md
+  echo "\`$1\`" >> README.md
 }
 
 # Share commands with the user & README
@@ -277,7 +278,9 @@ echo ""
 echo -e "${BOLD}Project creation complete.${NORMAL}"
 echo "All the below scripts should be run from the project root directory."
 echo "They are also saved in README.md"
-echo ""
+echo_record_standard ""
+echo_record_standard "------------------------"
+echo_record_standard ""
 
 if $ADD_EXPRESS; then
   echo_record_standard "To fire up your frontend, run:"
