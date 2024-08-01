@@ -1,3 +1,16 @@
+Typespark is designed to get your TypeScript project started as fast as possible with minimal questions.
+
+Just run `npx typespark` when in your projects folder, that's all you need to remember.
+
+You'll be prompted to provide a name and answer 3 yes/no questions. After the project is set up there is also an option of launching it. This will launch frontend, server, and a database navigator (prisma studio) all in one go, and provide a shared console for all three.
+
+Everything else is taken care of. All these annoying things you usually have to do when starting a new project:
+
+- NPM installation of dependencies and types all done
+- With Tailwind: 3 x required dependencies added and init script run, config.js file updated with content types
+- With Server: your server and frontend will already be speaking to each other locally
+- With Database: docker-compose.yml populated with starter info, prisma schema started with example objects, first migration completed,
+
 ## How to use this tool
 
 Run the command `npx typespark` in your parent folder for new projects. This script will create the project folder itself.
@@ -11,11 +24,18 @@ You will be prompted with the following questions/requests:
 
 All responses are Yes by default.
 
+## Prerequisites
+
+- Node.js and npm
+- [PM2](https://pm2.keymetrics.io/) (optional, but recommended for improved development experience)
+
+If you don't have PM2 installed, you can install it globally using `npm install -g pm2`
+
+PM2 lets you run multiple Node.js applications from a single Terminal window, with a combined view of all their console logs.
+
 ## Troubleshooting
 
-If you don't have PM2 installed some conveniences won't work, i.e. the app won't autoload. This will give a minor error message but it's fine.
-
-(PM2 lets you run multiple Node.js applications from a single Terminal window, with a combined view of all their console logs.)
+If you don't have PM2 installed some conveniences won't work, i.e. the app won't autoload at the end, and the "fire up everything" script added to your README won't work.
 
 PM2 shows the most recent error logs when you fire it up. This can sometimes be confusing. Use `pm2 flush` to clear out this noise.
 
@@ -23,9 +43,7 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 
 ### High Priority
 
-1. Fix Tailwind errors in client console:
-   0|devclient | warn - No utility classes were detected in your source files. If this is unexpected, double-check the `content` option in your Tailwind CSS configuration.
-   0|devclient | warn - https://tailwindcss.com/docs/content-configuration
+1. Investigate Tailwind warning in client console ("No utility classes were detected in your source files. If this is unexpected, double-check the content option in your Tailwind CSS configuration. https://tailwindcss.com/docs/content-configuration ")
 1. For full-stack projects we need a shared folder at parent level (for types etc) by default
 1. Add a better .env default and .env.example
 1. Make README.md boilerplate better
