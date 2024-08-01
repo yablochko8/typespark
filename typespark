@@ -23,7 +23,7 @@ echo ""
 
 read -p "Give the new app a name: " APP_NAME_INPUT
 
-
+# Transform app name to sanitized-snake-case
 APP_NAME=$(echo "$APP_NAME_INPUT" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g')
 
 if [ "$APP_NAME" != "$APP_NAME_INPUT" ]; then
@@ -41,7 +41,7 @@ if [ -d "$APP_NAME" ]; then
     fi
 fi
 
-
+# Make sure the app name is not empty
 if [ -z "$APP_NAME" ]; then
     echo "App name cannot be empty."
     exit 1
@@ -54,15 +54,13 @@ is_affirmative() {
 }
 
 # Get user responses, and set booleans based on responses
-
 read -p "Do you want to use Tailwind for styling? (Y/n): " ADD_TAILWIND_RESPONSE
 ADD_TAILWIND=$(is_affirmative "$ADD_TAILWIND_RESPONSE" && echo true || echo false)
 
-
-# Only offer database if user has said yes to a server
 read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS_RESPONSE
 ADD_EXPRESS=$(is_affirmative "$ADD_EXPRESS_RESPONSE" && echo true || echo false)
 
+# Only offer a database if user has said yes to a server
 if $ADD_EXPRESS; then
   read -p "Do you need a PostgreSQL database? (Y/n): " ADD_POSTGRES_RESPONSE
   ADD_POSTGRES=$(is_affirmative "$ADD_POSTGRES_RESPONSE" && echo true || echo false)
@@ -76,9 +74,7 @@ fi
 ADD_VITEST=false
 
 # Define the path to the boilerplate files
-BOILERPLATE_PATH=~/bin/boilerplates
-
-
+BOILERPLATE_PATH="$(dirname "$0")/boilerplates"
 
 echo "Building app with:
 ADD_TAILWIND = $ADD_TAILWIND
@@ -91,16 +87,33 @@ ADD_VITEST = $ADD_VITEST
 mkdir $APP_NAME
 cd $APP_NAME
 
-# Create the frontend app
+# Define the full path of the project folder and the frontend (which may be the same)
+PROJECT_FOLDER=$(pwd)
+
 # If there is going to be a server as well, we want frontend in its own /frontend folder
 # Otherwise we want it at the top level of the project
 if $ADD_EXPRESS; then
   mkdir frontend
   cd frontend
+  FRONTEND_FOLDER=$(pwd)
+else
+  FRONTEND_FOLDER=$PROJECT_FOLDER
 fi
 
+
+
+#######################################################################
+# CREATE THE FRONTEND APP
+#######################################################################
+
+cd $FRONTEND_FOLDER
+
 npm create vite@latest . -- --template react-swc-ts
+echo "Vite creation completed in $FRONTEND_FOLDER. Proceeding to next stage..."
+
 npm install
+echo "npm install completed. Proceeding to next stage..."
+
 npm init -y
 
 if $ADD_TAILWIND; then
@@ -121,23 +134,21 @@ else
   echo "Tailwind CSS setup skipped."
 fi
 
-
-if $ADD_EXPRESS; then
-  cd ..
-fi
-
-# PWD at end of a loop like this should always be project parent
-# (e.g. APPS-FROM-SCRIPTS/app-name)
-
+cd $PROJECT_FOLDER
 
 # Give the project a good gitignore and blank readme at top level
+# Leaving this until after Vite installation to avoid installation clashes
 cp $BOILERPLATE_PATH/boilerplate.dotgitignore ./.gitignore
 cp $BOILERPLATE_PATH/boilerplate.README.md ./README.md
 
-# Clear away any pm2 processes that are already in place and might compete for a PORT slot
-pm2 delete all
+# PWD at end of a loop like this should always be $PROJECT_FOLDER
+# (i.e. STARTING-FOLDER/$APP_NAME)
 
 
+
+#######################################################################
+# CREATE THE SERVER AND DATABASE
+#######################################################################
 
 # Add an express server if requested
 if $ADD_EXPRESS; then
@@ -149,16 +160,13 @@ if $ADD_EXPRESS; then
     echo "Express server setup completed in the 'server' directory."
     cp $BOILERPLATE_PATH/boilerplate.server.ts ./server.ts
     echo "Boilerplate server file copied to '$APP_NAME/server/server.ts'."
-    pm2 start 'bun --watch server.ts' --name devserver
+
   cd ..
   cp $BOILERPLATE_PATH/boilerplate.App.tsx frontend/src/App.tsx
   echo "Boilerplate client file updated with server routes in '$APP_NAME/frontend/src/App.tsx'."
 else
   echo "Express server setup skipped."
 fi
-
-
-
 
 # Add a database if requested
 if $ADD_POSTGRES; then
@@ -180,7 +188,6 @@ if $ADD_POSTGRES; then
     npx prisma migrate dev --name initial-setup --force
     echo "============ running docker compose up in detached mode ============"
     docker compose up -d
-    pm2 start 'npx prisma studio' --name prismastudio
   cd ..
 
 else
@@ -189,9 +196,12 @@ fi
 
 
 
+#######################################################################
+# ADD A TEST SUITE - CURRENTLY NOT USED
+#######################################################################
 
 # Add a test suite if requested
-# PROBABLY BROKEN RIGHT NOW
+# BROKEN RIGHT NOW AND THUS NOT CALLED
 if $ADD_VITEST; then
   npm install -D vitest
 
@@ -215,29 +225,99 @@ else
 fi
 
 
-# Open the project in VSCode
-code .
+#######################################################################
+# SCRIPTS AND INITIATION
+#######################################################################
 
-# Run the frontend code in PM2
+# Define the commands to run the frontend and server
+# FOR CONSIDERATION: This may break some .env handling, unless it all
+# lives at the very top, which seems wrong.
 if $ADD_EXPRESS; then
-  cd frontend
-    pm2 start 'npm run dev' --name devclient
-  cd ..
+  RUN_FRONTEND="npm --prefix frontend run dev"
+  RUN_SERVER="bun --watch server/server.ts"
+  RUN_FRONTEND_PM2="pm2 start '$RUN_FRONTEND' --name devclient"
+  RUN_SERVER_PM2="pm2 start '$RUN_SERVER' --name devserver"
+  RUN_ALL="$RUN_FRONTEND_PM2 && $RUN_SERVER_PM2"
+  if $ADD_POSTGRES; then
+    RUN_DB_STUDIO="npx --prefix ./server prisma studio --schema ./server/prisma/schema.prisma"
+    RUN_DB_PM2="pm2 start '$RUN_DB_STUDIO' --name prismastudio"
+    RUN_ALL="$RUN_ALL && $RUN_DB_PM2"
+  fi
+  RUN_ALL="pm2 delete all && $RUN_ALL && pm2 logs"
 else
-  pm2 start 'npm run dev' --name devclient
+  RUN_FRONTEND="npm run dev"
+  RUN_ALL=$RUN_FRONTEND
 fi
 
+# Define colors for console output
+BOLD='\033[1m'
+GREEN='\033[0;32m'
+CYAN_BOLD='\033[1;36m'
+MAGENTA_BOLD='\033[1;35m'
+NORMAL='\033[0m' # No Color
 
+# Function to echo to both console and README
+# Use -e to interpret escape sequences for console
+echo_record_standard() {
+    echo -e "$1"
+    echo "$1" >> README.md
+}
 
-# Wait half a second and then fire up the browser
-sleep .5
-open http://localhost:5173/
+echo_record_command() {
+  echo -e "${CYAN_BOLD}$1${NORMAL}"
+  echo "\`$1\`" >> README.md
+}
 
+echo_record_primary() {
+  echo -e "${MAGENTA_BOLD}$1${NORMAL}"
+  echo "\`$1\`" >> README.md
+}
 
-# Fire up PM2 logs if we have a server running there
-# This will give us the server console messages.
+# Share commands with the user & README
+echo ""
+echo -e "${BOLD}Project creation complete.${NORMAL}"
+echo "These scripts should be run from the project's root directory."
+echo_record_standard ""
+echo_record_standard "------------------------"
+echo_record_standard ""
+
 if $ADD_EXPRESS; then
-pm2 logs
+  echo_record_standard "To fire up your frontend, run:"
+  echo_record_command "$RUN_FRONTEND"
+  echo_record_standard ""
+
+  echo_record_standard "To fire up your server, run:"
+  echo_record_command "$RUN_SERVER"
+  echo_record_standard ""
+fi
+
+if $ADD_POSTGRES; then
+  echo_record_standard "To fire up your database, run:"
+  echo_record_command "$RUN_DB_STUDIO"
+  echo_record_standard ""
+fi
+
+echo_record_standard "The command for firing up everything is:"
+echo_record_primary "$RUN_ALL"
+echo_record_standard ""
+
+
+echo "These scripts are saved in the project's README.md"
+echo -ne "${GREEN}Typespark process complete! Would you like to fire everything up now? (Y/n): ${NORMAL}"
+read FIRST_OPEN_RESPONSE
+FIRST_OPEN=$(is_affirmative "$FIRST_OPEN_RESPONSE" && echo true || echo false)
+
+if $FIRST_OPEN; then
+  # Open the project in VSCode
+  code .
+  # Run the command the fires up everything
+  eval $RUN_ALL
 fi
 
 
+
+# # Auto-browser open removed because of port confusion
+# # Would love to get this back in if I can determine / hardcode the port number
+# # Wait half a second and then fire up the browser
+# sleep .5
+# open http://localhost:5173/
