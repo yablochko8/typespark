@@ -43,6 +43,7 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 
 ### High Priority
 
+1. Accommodate DB schema better in scripts. Namely: make sure docker is open, docker compose up, npx prisma migrate dev
 1. Investigate Tailwind warning in client console ("No utility classes were detected in your source files. If this is unexpected, double-check the content option in your Tailwind CSS configuration. https://tailwindcss.com/docs/content-configuration ")
 1. For full-stack projects we need a shared folder at parent level (for types etc) by default
 1. Add a better .env default and .env.example
