@@ -27,7 +27,7 @@ All responses are Yes by default.
 ## Prerequisites
 
 - Node.js and npm
-- [PM2](https://pm2.keymetrics.io/) (optional, but recommended for improved development experience)
+- [PM2](https://pm2.keymetrics.io/) (optional, only used for the dev fireup command for projects that include an Express server)
 
 If you don't have PM2 installed, you can install it globally using `npm install -g pm2`
 
@@ -39,12 +39,15 @@ If you don't have PM2 installed some conveniences won't work, i.e. the app won't
 
 PM2 shows the most recent error logs when you fire it up. This can sometimes be confusing. Use `pm2 flush` to clear out this noise.
 
+## Changelog
+
+- 0.2.3 (2025-01-28) - Switched to Tailwind version 4, using their first-party Vite plugin - ref: https://tailwindcss.com/blog/tailwindcss-v4#first-party-vite-plugin
+
 ## Feature gaps / known issues
 
 ### High Priority
 
-1. Investigate Tailwind warning in client console ("No utility classes were detected in your source files. If this is unexpected, double-check the content option in your Tailwind CSS configuration. https://tailwindcss.com/docs/content-configuration ")
-1. For full-stack projects we need a shared folder at parent level (for types etc) by default
+1. Full-stack projects would benefit from a shared folder at parent level (for types etc) by default
 1. Add a better .env default and .env.example
 1. Make README.md boilerplate better
 1. Make PM2 usage clearer and prompt install, or remove dependency.
