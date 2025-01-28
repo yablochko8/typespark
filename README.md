@@ -41,13 +41,14 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 
 ## Changelog
 
-- 0.2.3 (2025-01-28) - Switched to Tailwind version 4, using their first-party Vite plugin - ref: https://tailwindcss.com/blog/tailwindcss-v4#first-party-vite-plugin
+- 0.3.0 (2025-01-28) - Switched to Tailwind version 4, using their first-party Vite plugin - ref: https://tailwindcss.com/blog/tailwindcss-v4#first-party-vite-plugin
 
 ## Feature gaps / known issues
 
 ### High Priority
 
 1. Full-stack projects would benefit from a shared folder at parent level (for types etc) by default
+1. Accommodate DB schema better in scripts. Namely: make sure docker is open, docker compose up, npx prisma migrate dev
 1. Add a better .env default and .env.example
 1. Make README.md boilerplate better
 1. Make PM2 usage clearer and prompt install, or remove dependency.
