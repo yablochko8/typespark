@@ -14,7 +14,7 @@ echo "This script will bring to life a new TypeScript project."
 echo ""
 echo "Project will contain:"
 echo "- frontend app, created with Vite template"
-echo "- server using Express (optional), and"
+echo "- server using Express (optional)"
 echo "- database setup using Prisma & Postgres (optional)"
 echo ""
 echo "Project will appear in a new folder with your app name."
@@ -118,15 +118,12 @@ npm init -y
 
 if $ADD_TAILWIND; then
   # These track steps here https://tailwindcss.com/docs/guides/vite as of 2024-07-24
-  npm install -D tailwindcss postcss autoprefixer
-  npx tailwindcss init -p
-  cp $BOILERPLATE_PATH/boilerplate.tailwind.config.js ./tailwind.config.js
+  npm i tailwindcss @tailwindcss/vite
+  cp $BOILERPLATE_PATH/boilerplate.vite.config.ts ./vite.config.ts
 
 # The sed command (to prepend text to a file) is finecky. This only works on Mac.
   sed -i '' '1i\
-@tailwind base;\
-@tailwind components;\
-@tailwind utilities;\
+@import "tailwindcss";\
 ' src/index.css
 
   echo "Tailwind CSS setup completed."
