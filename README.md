@@ -7,7 +7,7 @@ You'll be prompted to provide a name and answer 3 yes/no questions. After the pr
 Everything else is taken care of. All these annoying things you usually have to do when starting a new project:
 
 - NPM installation of dependencies and types all done
-- With Tailwind: 3 x required dependencies added and init script run, config.js file updated with content types
+- Tailwind v4 working out of the box
 - With Server: your server and frontend will already be speaking to each other locally
 - With Database: docker-compose.yml populated with starter info, prisma schema started with example objects, first migration completed,
 
