@@ -108,7 +108,8 @@ fi
 
 cd $FRONTEND_FOLDER
 
-npm create vite@latest . -- --template react-swc-ts
+npm create vite@latest . -- --template react-swc-ts --yes
+# --yes is a shortcut to answer all questions with yes
 echo "Vite creation completed in $FRONTEND_FOLDER. Proceeding to next stage..."
 
 npm install
