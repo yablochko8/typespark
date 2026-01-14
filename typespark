@@ -74,7 +74,8 @@ fi
 ADD_VITEST=false
 
 # Define the path to the boilerplate files
-BOILERPLATE_PATH="$(dirname "$0")/boilerplates"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BOILERPLATE_PATH="$SCRIPT_DIR/boilerplates"
 
 echo "Building app with:
 ADD_TAILWIND = $ADD_TAILWIND
@@ -108,8 +109,7 @@ fi
 
 cd $FRONTEND_FOLDER
 
-npm create vite@latest . -- --template react-swc-ts --yes
-# --yes is a shortcut to answer all questions with yes
+npm create vite@latest . -- --template react-swc-ts --no-interactive
 echo "Vite creation completed in $FRONTEND_FOLDER. Proceeding to next stage..."
 
 npm install
@@ -161,6 +161,8 @@ if $ADD_EXPRESS; then
 
   cd ..
   cp $BOILERPLATE_PATH/boilerplate.App.tsx frontend/src/App.tsx
+  echo "Boilerplate_PATH = $BOILERPLATE_PATH"
+  ls -l "$BOILERPLATE_PATH"
   echo "Boilerplate client file updated with server routes in '$APP_NAME/frontend/src/App.tsx'."
 else
   echo "Express server setup skipped."
