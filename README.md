@@ -42,6 +42,7 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 ## Changelog
 
 - 0.3.0 (2025-01-28) - Switched to Tailwind version 4, using their first-party Vite plugin - ref: https://tailwindcss.com/blog/tailwindcss-v4#first-party-vite-plugin
+- 0.4.0 (2026-01-14) - Support for Vite 7, Node 20. Amended vite command to explicitly answer Yes to all questions.
 
 ## Feature gaps / known issues
 
