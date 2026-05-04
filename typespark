@@ -68,11 +68,6 @@ else
   ADD_POSTGRES=false
 fi
 
-# read -p "Do you to add Vitest for test coverage? (Y/n): " ADD_VITEST_RESPONSE
-# ADD_VITEST=$(is_affirmative "$ADD_VITEST_RESPONSE" && echo true || echo false)
-# temporary override
-ADD_VITEST=false
-
 # Define the path to the boilerplate files
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BOILERPLATE_PATH="$SCRIPT_DIR/boilerplates"
@@ -81,7 +76,6 @@ echo "Building app with:
 ADD_TAILWIND = $ADD_TAILWIND
 ADD_EXPRESS = $ADD_EXPRESS
 ADD_POSTGRES = $ADD_POSTGRES
-ADD_VITEST = $ADD_VITEST
 "
 
 # Create the app folder and jump into it
@@ -109,7 +103,10 @@ fi
 
 cd $FRONTEND_FOLDER
 
-npm create vite@latest . -- --template react-swc-ts --no-interactive
+# create-vite: use --no-interactive and a valid --template (see create-vite --help).
+# Invalid templates (e.g. removed react-swc-ts) are ignored; without a template,
+# non-interactive mode defaults to vanilla-ts.
+npm create vite@latest . -- --no-interactive --template react-ts
 echo "Vite creation completed in $FRONTEND_FOLDER. Proceeding to next stage..."
 
 npm install
@@ -194,35 +191,6 @@ else
   echo "Postgres setup skipped."
 fi
 
-
-
-#######################################################################
-# ADD A TEST SUITE - CURRENTLY NOT USED
-#######################################################################
-
-# Add a test suite if requested
-# BROKEN RIGHT NOW AND THUS NOT CALLED
-if $ADD_VITEST; then
-  npm install -D vitest
-
-  if $ADD_POSTGRES; then
-  npm install dotenv
-  cp $BOILERPLATE_PATH/boilerplate.docker-compose.test.yml ./docker-compose.test.yml
-  cp $BOILERPLATE_PATH/boilerplate.dotenv.test ./.env.test
-  npm pkg set scripts.test:env="npx dotenv -e .env.test vitest"
-  npm pkg set scripts.test:server:up="pm2 start 'bun server/server.ts' --name testserver"
-  npm pkg set scripts.test:server:down="pm2 delete testserver"
-  npm pkg set scripts.test:prisma:migrate="npx prisma migrate dev --name initial-setup --force"
-  npm pkg set scripts.test:docker:up="docker compose -f docker-compose.test.yml up -d"
-  npm pkg set scripts.test:docker:down="docker compose -f docker-compose.test.yml down"
-  npm pkg set scripts.test:run="vitest run"
-  npm pkg set scripts.test-all="npm run test:docker:up && npx dotenv-cli -e .env.test -- npm run test:prisma:migrate && npx dotenv-cli -e .env.test -- npm run test:server:up && npx dotenv-cli -e .env.test -- npm run test:run; npm run test:server:down && npm run test:docker:down"
-
-  fi
-
-else
-  echo "Vitest setup skipped."
-fi
 
 
 #######################################################################

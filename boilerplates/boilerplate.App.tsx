@@ -40,9 +40,9 @@ function App() {
   const [valuesFromServer, setValuesFromServer] = useState(["starting data"]);
 
   return (
-    <>
+    <div className="flex flex-col items-center justify-center h-screen">
       <div>Open the browser console to see this working.</div>
-      <button onClick={() => getData()}>Call the GET Endpoint</button>
+      <button className="bg-slate-500 hover:bg-slate-600 text-white p-2 rounded-md" onClick={() => getData()}>Call the GET Endpoint</button>
       <br />
       <br />
 
@@ -55,7 +55,7 @@ function App() {
         }}
       />
       <br />
-      <button
+      <button className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md"
         onClick={() =>
           postDataAndDisplayResponse(submittedValue, setValuesFromServer)
         }
@@ -65,7 +65,7 @@ function App() {
       {valuesFromServer.map((value, index) => {
         return <div key={index}>{value}</div>;
       })}
-    </>
+    </div>
   );
 }
 
