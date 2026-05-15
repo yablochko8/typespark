@@ -54,7 +54,7 @@ is_affirmative() {
 }
 
 # Get user responses, and set booleans based on responses
-read -p "Do you want to use Tailwind for styling? (Y/n): " ADD_TAILWIND_RESPONSE
+read -p "Do you want to use Tailwind and DaisyUI for styling? (Y/n): " ADD_TAILWIND_RESPONSE
 ADD_TAILWIND=$(is_affirmative "$ADD_TAILWIND_RESPONSE" && echo true || echo false)
 
 read -p "Do you want to add an Express server? (Y/n): " ADD_EXPRESS_RESPONSE
@@ -106,7 +106,7 @@ cd $FRONTEND_FOLDER
 # create-vite: use --no-interactive and a valid --template (see create-vite --help).
 # Invalid templates (e.g. removed react-swc-ts) are ignored; without a template,
 # non-interactive mode defaults to vanilla-ts.
-npm create vite@latest . -- --no-interactive --template react-ts
+npm create vite@7 . -- --no-interactive --template react-ts
 echo "Vite creation completed in $FRONTEND_FOLDER. Proceeding to next stage..."
 
 npm install
@@ -115,16 +115,13 @@ echo "npm install completed. Proceeding to next stage..."
 npm init -y
 
 if $ADD_TAILWIND; then
-  # These track steps here https://tailwindcss.com/docs/guides/vite as of 2024-07-24
-  npm i tailwindcss @tailwindcss/vite
-  cp $BOILERPLATE_PATH/boilerplate.vite.config.ts ./vite.config.ts
-
-# The sed command (to prepend text to a file) is finecky. This only works on Mac.
-  sed -i '' '1i\
-@import "tailwindcss";\
-' src/index.css
-
-  echo "Tailwind CSS setup completed."
+  # These track steps here https://tailwindcss.com/docs/installation/using-vite as of 2026-05-15
+  npm i tailwindcss@4 @tailwindcss/vite@4 daisyui@5
+  rm src/App.css
+  cp $BOILERPLATE_PATH/frontend-tailwind-daisyui/boilerplate.vite.config.ts ./vite.config.ts
+  cp $BOILERPLATE_PATH/frontend-tailwind-daisyui/boilerplate.index.css src/index.css
+  cp $BOILERPLATE_PATH/frontend-tailwind-daisyui/boilerplate.App.tsx src/App.tsx
+  echo "Tailwind CSS + DaisyUI setup completed."
 else
   echo "Tailwind CSS setup skipped."
 fi
@@ -276,13 +273,17 @@ read FIRST_OPEN_RESPONSE
 FIRST_OPEN=$(is_affirmative "$FIRST_OPEN_RESPONSE" && echo true || echo false)
 
 if $FIRST_OPEN; then
-  # Open the project in VSCode
-  code .
-  # Run the command the fires up everything
+  # Open the project in Cursor if available, otherwise VSCode
+  if command -v cursor &> /dev/null; then
+    cursor .
+  elif command -v code &> /dev/null; then
+    code .
+  else
+    echo "Neither Cursor nor VSCode found. Open the project manually."
+  fi
+  # Run the command that fires up everything
   eval $RUN_ALL
 fi
-
-
 
 # # Auto-browser open removed because of port confusion
 # # Would love to get this back in if I can determine / hardcode the port number
