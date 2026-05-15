@@ -1,6 +1,6 @@
 {
   "name": "typespark",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Boilerplate scripts for bringing new full-stack TypeScript projects to life.",
   "main": "index.js",
   "bin": {
