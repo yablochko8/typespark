@@ -44,7 +44,7 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 - 0.3.0 (2025-01-28) - Switched to Tailwind version 4, using their first-party Vite plugin - ref: https://tailwindcss.com/blog/tailwindcss-v4#first-party-vite-plugin
 - 0.4.0 (2026-01-14) - Support for Vite 7, Node 20. Amended vite command to explicitly answer Yes to all questions.
 - 0.5.0 (2026-05-01) - Support for Vite 7.1
-- 0.6.0 (2026-05-15) - Now includes DaisyUI with Tailwind, and deletes typical CSS kruft. Also now supports non-Mac. Defaults to opening in Cursor, fallback is VS Code
+- 1.0.0 (2026-05-15) - Now includes DaisyUI with Tailwind, and deletes typical CSS kruft. Also now supports non-Mac. Defaults to opening in Cursor, fallback is VS Code
 
 ## Roadmap
 
