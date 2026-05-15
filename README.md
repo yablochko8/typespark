@@ -7,7 +7,7 @@ You'll be prompted to provide a name and answer 3 yes/no questions. After the pr
 Everything else is taken care of. All these annoying things you usually have to do when starting a new project:
 
 - NPM installation of dependencies and types all done
-- Tailwind v4 working out of the box
+- Tailwind and DaisyUI working out of the box
 - With Server: your server and frontend will already be speaking to each other locally
 - With Database: docker-compose.yml populated with starter info, prisma schema started with example objects, first migration completed,
 
@@ -44,21 +44,15 @@ PM2 shows the most recent error logs when you fire it up. This can sometimes be 
 - 0.3.0 (2025-01-28) - Switched to Tailwind version 4, using their first-party Vite plugin - ref: https://tailwindcss.com/blog/tailwindcss-v4#first-party-vite-plugin
 - 0.4.0 (2026-01-14) - Support for Vite 7, Node 20. Amended vite command to explicitly answer Yes to all questions.
 - 0.5.0 (2026-05-01) - Support for Vite 7.1
-- 0.6.0 (2026-05-15) - Now includes DaisyUI with Tailwind, and deletes typical CSS kruft. Also now supports non-Mac.
+- 0.6.0 (2026-05-15) - Now includes DaisyUI with Tailwind, and deletes typical CSS kruft. Also now supports non-Mac. Defaults to opening in Cursor, fallback is VS Code
 
-## Feature gaps / known issues
-
-### High Priority
+## Roadmap
 
 1. Full-stack projects would benefit from a shared folder at parent level (for types etc) by default
 1. Accommodate DB schema better in scripts. Namely: make sure docker is open, docker compose up, npx prisma migrate dev
 1. Add a better .env default and .env.example
 1. Make README.md boilerplate better
 1. Make PM2 usage clearer and prompt install, or remove dependency.
-
-### Low Priority
-
-1. Fix the test suite part of this script so it works again with the varied folder structure.
 
 ## Contact
 

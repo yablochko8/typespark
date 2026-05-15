@@ -273,13 +273,17 @@ read FIRST_OPEN_RESPONSE
 FIRST_OPEN=$(is_affirmative "$FIRST_OPEN_RESPONSE" && echo true || echo false)
 
 if $FIRST_OPEN; then
-  # Open the project in VSCode
-  code .
-  # Run the command the fires up everything
+  # Open the project in Cursor if available, otherwise VSCode
+  if command -v cursor &> /dev/null; then
+    cursor .
+  elif command -v code &> /dev/null; then
+    code .
+  else
+    echo "Neither Cursor nor VSCode found. Open the project manually."
+  fi
+  # Run the command that fires up everything
   eval $RUN_ALL
 fi
-
-
 
 # # Auto-browser open removed because of port confusion
 # # Would love to get this back in if I can determine / hardcode the port number
